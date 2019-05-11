@@ -1,0 +1,14 @@
+This is the rules of the game "Zombie-Shooter".
+
+Player:
+
+Manage the player by "W-S-A-D" or by keyboard arrows.
+Shoot with the left and right mouse buttons or scrolling.
+
+Others:
+
+Use "TAB" to show or hide minimap.
+Use "ESC" to quit to the menu.
+
+
+
