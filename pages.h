@@ -7,14 +7,14 @@
 
 class WindowSent{
 public:
-    WindowSent(RenderWindow &window1, VideoMode &mode1, int hard1):
+    WindowSent(RenderWindow &window1, VideoMode &mode1, float hard1):
             window(window1),
             mode(mode1),
             hard(hard1){};
 
     RenderWindow &window;
     VideoMode &mode;
-    int hard;
+    float hard;
 };
 
 void openSetting(RenderWindow &window, VideoMode &mode);

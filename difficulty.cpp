@@ -2,6 +2,7 @@
 #include "game.cpp"
 #include "button.h"
 #include "pages.h"
+#include "multiplayer.cpp"
 
 #pragma once
 
@@ -12,6 +13,7 @@ void difficulty(RenderWindow &window, VideoMode &mode){
     Button easy(mode, "EASY", pathToDirectory + "fonts/font.ttf", Color::Red, 0);
     Button medium(mode, "MEDIUM", pathToDirectory + "fonts/font.ttf", Color::Red, 1);
     Button hard(mode, "HARD", pathToDirectory + "fonts/font.ttf", Color::Red, 2);
+    Button multiplayer(mode, "MULTIPLAYER", pathToDirectory + "fonts/font.ttf", Color::Red, 3);
     Button back(mode, "BACK", pathToDirectory + "fonts/font.ttf", Color::Red);
 
     Sprite spriteCursor(textureCursor0);
@@ -36,7 +38,7 @@ void difficulty(RenderWindow &window, VideoMode &mode){
                isInsideButton(Vector2f(Mouse::getPosition(window).x, Mouse::getPosition(window).y), easy.sprite)){
                 soundsAll.sound[9].play();
                 musicAll.music[numberMusicMenu].pause();
-                WindowSent windowSent(window, mode, 1);
+                WindowSent windowSent(window, mode, 0.2);
                 Thread thread(&openGame, windowSent);
                 thread.launch();
                 thread.wait();
@@ -49,7 +51,7 @@ void difficulty(RenderWindow &window, VideoMode &mode){
                     isInsideButton(Vector2f(Mouse::getPosition(window).x, Mouse::getPosition(window).y), medium.sprite)){
                 soundsAll.sound[9].play();
                 musicAll.music[numberMusicMenu].pause();
-                WindowSent windowSent(window, mode, 100);
+                WindowSent windowSent(window, mode, 1);
                 Thread thread(&openGame, windowSent);
                 thread.launch();
                 thread.wait();
@@ -62,8 +64,21 @@ void difficulty(RenderWindow &window, VideoMode &mode){
                     isInsideButton(Vector2f(Mouse::getPosition(window).x, Mouse::getPosition(window).y), hard.sprite)){
                 soundsAll.sound[9].play();
                 musicAll.music[numberMusicMenu].pause();
-                WindowSent windowSent(window, mode, 500);
+                WindowSent windowSent(window, mode, 5);
                 Thread thread(&openGame, windowSent);
+                thread.launch();
+                thread.wait();
+                musicAll.music[numberMusicMenu].play();
+
+                return;
+            }
+
+            else if(event.type == event.MouseButtonReleased && event.mouseButton.button == Mouse::Left &&
+                    isInsideButton(Vector2f(Mouse::getPosition(window).x, Mouse::getPosition(window).y), multiplayer.sprite)){
+                soundsAll.sound[9].play();
+                musicAll.music[numberMusicMenu].pause();
+                WindowSent windowSent(window, mode, 1);
+                Thread thread(&openMultiplayer, windowSent);
                 thread.launch();
                 thread.wait();
                 musicAll.music[numberMusicMenu].play();
@@ -82,6 +97,7 @@ void difficulty(RenderWindow &window, VideoMode &mode){
         easy.update(window);
         medium.update(window);
         hard.update(window);
+        multiplayer.update(window);
         back.update(window);
         updateCursor(window, spriteCursor);
 
@@ -89,6 +105,7 @@ void difficulty(RenderWindow &window, VideoMode &mode){
         easy.draw(window);
         medium.draw(window);
         hard.draw(window);
+        multiplayer.draw(window);
         back.draw(window);
         window.draw(spriteCursor);
 

@@ -4,7 +4,7 @@ project(game)
 set(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp network.h)
 add_executable(game ${SOURCE_FILES})
 
 # Detect and add SFML

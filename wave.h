@@ -5,6 +5,8 @@
 #include "pages.h"
 #include "music.h"
 
+#pragma once
+
 int waveDuration = 30;
 const float waveRelax = 100;
 unsigned int numberWave = 0;
