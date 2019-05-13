@@ -1,7 +1,6 @@
 #include <math.h>
 #include "paths.h"
 #include "background.h"
-#include "music.h"
 
 #pragma once
 

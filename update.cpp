@@ -1,5 +1,6 @@
 #include "objects.h"
 #include "background.h"
+#include "music.h"
 #pragma once
 
 bool isInside(View &gameView, Sprite &object, int sideOfBorder){     //   1
@@ -262,11 +263,6 @@ void gameViewUpdate(View &gameView, RenderWindow &window, Organism &player, Time
 }
 
 void strikeWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Organism> &enemies, std::vector<Corpse> &dead, std::vector<Feature> &items){
-//void strikeWeapon(Strike *A){
-//    View &gameView = A->gameView;
-//    std::vector <Weapon> &bullets = A->bullets;
-//    std::vector <Organism> &enemies = A->enemies;
-//    std::vector<Corpse> &dead = A->dead;
 
     int numberBullets = 0;
     for(auto &i : bullets){
@@ -610,4 +606,79 @@ void clearAll(std::vector<Organism> &zombies, std::vector<Organism> &zombies1, s
 
     backgroundTypes.clear();
 
+}
+
+void updateMusic(float &timeBuffer6, float &timeBuffer7, Organism &player, View &gameView,
+                 std::vector<Organism> &zombies, std::vector<Organism> &zombies1, std::vector<Organism> &zombies2,
+                 std::vector<Organism> &zombies3, std::vector<Organism> &dogs){
+
+    //sounds
+    if(timeBuffer6 > 10){
+        timeBuffer6 = 0;
+        soundsAll.sound[4].play();
+    }
+    if(timeBuffer7 > 10 && player.health < playerFullHealth / 2){
+        timeBuffer7 = 0;
+        soundsAll.sound[5].play();
+    } else if(player.health > playerFullHealth / 2){
+        soundsAll.sound[5].pause();
+    }
+
+    //get total number of zombies
+    int numberZombiesInGameView = 0;
+    for(auto &i  : zombies){
+        if(isInside(gameView, i.organism.getPosition(), 0))
+            numberZombiesInGameView++;
+
+    }
+    for(auto &i  : zombies1){
+        if(isInside(gameView, i.organism.getPosition(), 0))
+            numberZombiesInGameView++;
+
+    }
+    for(auto &i  : zombies2){
+        if(isInside(gameView, i.organism.getPosition(), 0))
+            numberZombiesInGameView++;
+
+    }
+    for(auto &i  : zombies3){
+        if(isInside(gameView, i.organism.getPosition(), 0))
+            numberZombiesInGameView++;
+
+    }
+    for(auto &i  : dogs){
+        if(isInside(gameView, i.organism.getPosition(), 0))
+            numberZombiesInGameView++;
+
+    }
+
+    if(numberZombiesInGameView > 200){
+        if(soundsAll.sound[6].getStatus() != soundsAll.sound[6].Playing)
+            soundsAll.sound[6].play();
+    } else if(numberZombiesInGameView < 100){
+        soundsAll.sound[6].pause();
+    }
+
+    //water
+    if(player.getPosition().type == 18){
+        if(soundsAll.sound[10].getStatus() != soundsAll.sound[10].Playing)
+            soundsAll.sound[10].play();
+    } else {
+        soundsAll.sound[10].pause();
+    }
+    //grass
+    if(player.getPosition().type == 21 || player.getPosition().type == 80
+       || player.getPosition().type == 16 || player.getPosition().type == 17){
+        if(soundsAll.sound[11].getStatus() != soundsAll.sound[11].Playing)
+            soundsAll.sound[11].play();
+    } else {
+        soundsAll.sound[11].pause();
+    }
+    //sand
+    if(player.getPosition().type == 20){
+        if(soundsAll.sound[12].getStatus() != soundsAll.sound[12].Playing)
+            soundsAll.sound[12].play();
+    } else {
+        soundsAll.sound[12].pause();
+    }
 }

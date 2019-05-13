@@ -9,7 +9,7 @@ struct Draw{
     Draw(RenderWindow &window1, View &gameView1, std::vector<Organism> &zombies1, std::vector<Organism> &zombies11,
          std::vector<Organism> &zombies21, std::vector<Organism> &zombies31, std::vector<Organism> &dogs1,
          std::vector<Corpse> &dead1, std::vector<Weapon> &bullets1, std::vector<Bomb> &bombs1, std::vector<Feature> &items1,  std::vector<ConvexShape> &trapezes1, Organism &player1,
-         Bar &lifeBar1, Bar &bubbleBar1, Bar &shieldBar1, Bar &bulletBar1, Bar &bombBar1, TimeBar &timeBar1, Sprite &spriteCursor1, Sprite &shadow1, Time &time61) :
+         Bar &lifeBar1, Bar &bubbleBar1, Bar &shieldBar1, Bar &bulletBar1, Bar &bombBar1, TimeBar &timeBar1, Sprite &spriteCursor1, Sprite &shadow1) :
          window(window1),
          gameView(gameView1),
          zombies(zombies1),
@@ -30,8 +30,7 @@ struct Draw{
          bombBar(bombBar1),
          timeBar(timeBar1),
          spriteCursor(spriteCursor1),
-         shadow(shadow1),
-         time6(time61){};
+         shadow(shadow1){};
 
     RenderWindow &window;
     View &gameView;
@@ -58,8 +57,6 @@ struct Draw{
 
     Sprite &spriteCursor;
     Sprite &shadow;
-
-    Time &time6;
 };
 
 
@@ -247,7 +244,6 @@ void drawGameview(Draw &A){
         numberBars++;
     }
 
-    A.timeBar.update(A.gameView, A.time6);
     A.window.draw(A.timeBar.text);
 
     A.window.draw(A.spriteCursor);

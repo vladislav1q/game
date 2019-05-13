@@ -1,6 +1,6 @@
 #include "SFML/Graphics.hpp"
 
-void endGame(RenderWindow &window, View &gameView, Time &time6, Sprite &spriteCursor){
+void endGame(RenderWindow &window, View &gameView, Time time6, Sprite &spriteCursor){
     Event event;
 
     soundsAll.stop();

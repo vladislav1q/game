@@ -23,9 +23,14 @@ Vector2f norm(Vector2f a){
 
 void setShadow(std::vector<Opaque> &houses, std::vector<sf::ConvexShape> &trapezes, sf::Vector2f player){
 
+//    Clock clock1;
+//    Time time1 = clock1.getElapsedTime();
+//    std::cout << std::endl << "Shadow started 0: " << time1.asSeconds();
     int shadowLength = 100000;
 
     trapezes.clear();
+//    time1 = clock1.getElapsedTime();
+//    std::cout << "1: " << time1.asSeconds() << std::endl;
 
     for(auto &i : houses){
 
@@ -73,5 +78,8 @@ void setShadow(std::vector<Opaque> &houses, std::vector<sf::ConvexShape> &trapez
         trapezes.push_back(trapeze2);
         trapezes.push_back(trapeze3);
 
+
     }
+//    time1 = clock1.getElapsedTime();
+//    std::cout << "2: " << time1.asSeconds() << std::endl;
 }

@@ -3,7 +3,7 @@
 #include "draw.h"
 #include "thread"
 #include "pages.h"
-#include "music.h"
+//#include "music.cpp"
 #include "wave.h"
 #include "shadows.h"
 #include "endGame.h"
@@ -17,7 +17,6 @@ void openGame(WindowSent windowSent)
 {
     srand(time(NULL));
     musicAll.music[numberMusicGame].play();
-
     hard = windowSent.hard;
 
     float resolution = windowSent.mode.height / windowSent.mode.width;
@@ -41,61 +40,45 @@ void openGame(WindowSent windowSent)
     std::vector<ConvexShape> trapezes;
 
     setTextures();
-    //std::cout << 1000 <<trapezes.size() << std::endl;
     setBackground(windowSent.window, houses);
-    //std::cout << 2000 <<trapezes.size() << std::endl;
 
     MinimapThread minimapThread;
-
-//    std::thread thread(&setMinimap, &minimapThread);
-////    Thread thread(&setMinimap, &minimapThread);
-////    thread.launch();
-//    //thread.wait();
-
+    Thread thread(&setMinimap, &minimapThread);
+    thread.launch();
 
     //Create PlayerSprite
     Sprite spritePlayer(texturePlayerPaths[0]);
-
     //Create ZombieSprite
     Sprite spriteZombie(textureZombiePathsWalkFullHealth[0]);
-
     //Create Zombie1Sprite
     Sprite spriteZombie1(textureZombie1PathsWalkFullHealth[0]);
     spriteZombie1.setScale(3, 3);
-
     //Create Zombie2Sprite
     Sprite spriteZombie2(textureZombie2PathsWalkFullHealth[0]);
     spriteZombie2.setScale(1.5, 1.5);
-
     //Create Zombie3prite
     Sprite spriteZombie3(textureZombie3PathsWalkFullHealth[0]);
     spriteZombie3.setScale(1.5, 1.5);
-
     //Create DogSprite
     Sprite spriteDog(textureDogPathsWalkFullHealth[0]);
-
     //Create BulletSprite
     textureBullet1.loadFromFile(pathToDirectory + "pngForGame/bullet1.png");
     Sprite spriteBullet1(textureBullet1);
     textureBullet2.loadFromFile(pathToDirectory + "pngForGame/bullet2.png");
     Sprite spriteBullet2(textureBullet2);
-
     //Create BombSprite
     textureBomb1.loadFromFile(pathToDirectory + "pngForGame/bomb1.png");
     Sprite spriteBomb1(textureBomb1);
     textureBomb2.loadFromFile(pathToDirectory + "pngForGame/bomb2.png");
     Sprite spriteBomb2(textureBomb2);
-
     //Create items Textures
     textureHeart.loadFromFile(pathToDirectory + "pngForGame/heart.png");
     textureShield.loadFromFile(pathToDirectory + "pngForGame/shield.png");
     textureBullet.loadFromFile(pathToDirectory + "pngForGame/bullets.png");
     textureBomb.loadFromFile(pathToDirectory + "pngForGame/bombs.png");
-
     //Create MouseSprite
     Sprite spriteCursor(textureCursor0);
     setCursor(windowSent.window, spriteCursor);
-
     //Create Location Texture
     textureLocation.loadFromFile(pathToDirectory + "pngForGame/location.png");
     Sprite location(textureLocation);
@@ -118,6 +101,7 @@ void openGame(WindowSent windowSent)
     player.organism.setOrigin((float)playerSize.x/2, (float)playerSize.y/2);
     player.organism.setScale(0.6, 0.6);
 
+    //Create shadow
     Texture textureShadow;
     textureShadow.loadFromFile(pathToDirectory + "pngForGame/shadow.png");
     Sprite spriteShadow(textureShadow);
@@ -128,6 +112,7 @@ void openGame(WindowSent windowSent)
 
     gameView.setCenter(player.organism.getPosition());
 
+    //create bars
     Bar lifeBar(pathToDirectory + "pngForGame/heart.png", pathToDirectory + "fonts/font.ttf", Color(255, 0, 0, 255), 0.3);
     TimeBar timeBar(pathToDirectory + "fonts/font.ttf");
     Bar shieldBar(pathToDirectory + "pngForGame/shield.png", pathToDirectory + "fonts/font.ttf", Color(131, 131, 157, 255), 0.09);
@@ -140,26 +125,26 @@ void openGame(WindowSent windowSent)
     textureCorpse.loadFromFile(corpsePath);
 
     Clock clock;
+    Clock clockPause;
     Clock clock6;
 
     float timeBuffer6 = 0;
     float timeBuffer7 = 0;
     float timeBuffer8 = 0;
+    float timeBuffer9 = 0;
     float timeBufferBombInit = 0;
     float timebufferMinimapInit = 0;
     float timeBufferMinimap = 0;
 
     bool minimap = false;
-    Time time,time6;
+    Time time,time6, timePause;
+    timePause = clock6.restart();
 
     Draw A(windowSent.window, gameView, zombies, zombies1, zombies2, zombies3, dogs, dead, bullets, bombs, items, trapezes,
-           player, lifeBar, bubbleBar, shieldBar, bulletBar, bombBar, timeBar, spriteCursor, spriteShadow, time6);
+           player, lifeBar, bubbleBar, shieldBar, bulletBar, bombBar, timeBar, spriteCursor, spriteShadow);
 
 
     //update Window
-
-    Thread thread(&setMinimap, &minimapThread);
-    thread.launch();
 
     while (windowSent.window.isOpen())
     {
@@ -173,86 +158,19 @@ void openGame(WindowSent windowSent)
         timeBuffer6 += time.asSeconds();
         timeBuffer7 += time.asSeconds();
         timeBuffer8 += time.asSeconds();
+        timeBuffer9 += time.asSeconds();
         timeBufferBombInit += time.asSeconds();
         timeBufferMinimap += time.asSeconds();
         timebufferMinimapInit += time.asSeconds();
 
+        std::cout << time.asSeconds()<< std::endl;
 
 //1
         time6 = clock6.getElapsedTime();
         std::cout << " 1: "<< time6.asSeconds();
 
-        //sounds
-        if(timeBuffer6 > 10){
-            timeBuffer6 = 0;
-            soundsAll.sound[4].play();
-        }
-        if(timeBuffer7 > 10 && player.health < playerFullHealth / 2){
-            timeBuffer7 = 0;
-            soundsAll.sound[5].play();
-        } else if(player.health > playerFullHealth / 2){
-            soundsAll.sound[5].pause();
-        }
 
-        //get total number of zombies
-        int numberZombiesInGameView = 0;
-        for(auto &i  : zombies){
-            if(isInside(gameView, i.organism.getPosition(), 0))
-                numberZombiesInGameView++;
-
-        }
-        for(auto &i  : zombies1){
-            if(isInside(gameView, i.organism.getPosition(), 0))
-                numberZombiesInGameView++;
-
-        }
-        for(auto &i  : zombies2){
-            if(isInside(gameView, i.organism.getPosition(), 0))
-                numberZombiesInGameView++;
-
-        }
-        for(auto &i  : zombies3){
-            if(isInside(gameView, i.organism.getPosition(), 0))
-                numberZombiesInGameView++;
-
-        }
-        for(auto &i  : dogs){
-            if(isInside(gameView, i.organism.getPosition(), 0))
-                numberZombiesInGameView++;
-
-        }
-
-        if(numberZombiesInGameView > 100){
-            if(soundsAll.sound[6].getStatus() != soundsAll.sound[6].Playing)
-                soundsAll.sound[6].play();
-        } else if(numberZombiesInGameView < 100){
-            soundsAll.sound[6].pause();
-        }
-
-        //water
-        if(player.getPosition().type == 18){
-            if(soundsAll.sound[10].getStatus() != soundsAll.sound[10].Playing)
-                soundsAll.sound[10].play();
-        } else {
-            soundsAll.sound[10].pause();
-        }
-        //grass
-        if(player.getPosition().type == 21 || player.getPosition().type == 80
-            || player.getPosition().type == 16 || player.getPosition().type == 17){
-            if(soundsAll.sound[11].getStatus() != soundsAll.sound[11].Playing)
-                soundsAll.sound[11].play();
-        } else {
-            soundsAll.sound[11].pause();
-        }
-        //sand
-        if(player.getPosition().type == 20){
-            if(soundsAll.sound[12].getStatus() != soundsAll.sound[12].Playing)
-                soundsAll.sound[12].play();
-        } else {
-            soundsAll.sound[12].pause();
-        }
-
-        //enum
+        updateMusic(timeBuffer6, timeBuffer7, player, gameView, zombies, zombies1, zombies2, zombies3, dogs);
 
 //2
         time6 = clock6.getElapsedTime();
@@ -286,7 +204,7 @@ void openGame(WindowSent windowSent)
 
         deleteBomb(bombs);
 
-
+//4
         time6 = clock6.getElapsedTime();
         std::cout << " 4: "<< time6.asSeconds();
 
@@ -345,10 +263,25 @@ void openGame(WindowSent windowSent)
                 j++;
         }
 
+        updateCursor(windowSent.window, spriteCursor);
+        gameViewUpdate(gameView, windowSent.window, player, time);
 
-        if(Keyboard::isKeyPressed(Keyboard::Space) ){
+        timeBar.update(gameView, time6 - timePause);
 
+        //pause the game
+        if(Keyboard::isKeyPressed(Keyboard::Space) && timeBuffer9 > 0.3){
+            timeBuffer9 = 0;
+            clockPause.restart();
+            soundsAll.stop();
+
+            sleep(seconds(0.3));
+            while(!Keyboard::isKeyPressed(Keyboard::Space)){
+                sleep(seconds(0.01));
+            }
+            clock.restart();
+            timePause += clockPause.getElapsedTime();
         }
+
         if(Keyboard::isKeyPressed(Keyboard::Tab) && timebufferMinimapInit > 0.2){
             timebufferMinimapInit = 0;
             if(minimap)
@@ -366,11 +299,10 @@ void openGame(WindowSent windowSent)
             return;
         }
 
-
         while (windowSent.window.pollEvent(event))
         {
             if (event.type == Event::Closed){
-//                thread.terminate();
+                thread.terminate();
                 windowSent.window.close();
             }
 
@@ -391,7 +323,6 @@ void openGame(WindowSent windowSent)
 
                 }
             }
-
 
             if (event.type == event.MouseButtonReleased && event.mouseButton.button == Mouse::Left){
                 soundsAll.sound[0].play();
@@ -420,9 +351,6 @@ void openGame(WindowSent windowSent)
         }
 
 
-
-        updateCursor(windowSent.window, spriteCursor);
-
         //6
         time6 = clock6.getElapsedTime();
         std::cout << " 6: " << time6.asSeconds();
@@ -438,9 +366,6 @@ void openGame(WindowSent windowSent)
 
 
 
-
-        gameViewUpdate(gameView, windowSent.window, player, time);
-
         //minimap Update & Draw
         drawMinimap(windowSent.window, gameView, minimapView, minimap, player, location, minimapThread.sprite, thickness);
 
@@ -451,13 +376,13 @@ void openGame(WindowSent windowSent)
         std::cout << " 8: " << time6.asSeconds();
 
         std::cout << "End"<< std::endl;
-//        std::cout << time.asSeconds()<< std::endl;
 
 
         if(player.health <= 0){
             thread.terminate();
             clearAll(zombies, zombies1, zombies2, zombies3, dogs, bullets, bombs, dead, items, houses, trapezes);
-            endGame(windowSent.window, gameView, time6, spriteCursor);
+            soundsAll.stop();
+            endGame(windowSent.window, gameView, time6 - timePause, spriteCursor);
 
             return;
         }
