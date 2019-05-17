@@ -3,19 +3,28 @@
 
 #pragma once
 
-bool serverRun = false;
 
 void openMultiplayer(WindowSent windowSent){
-    const unsigned short port = 50001;
+    const unsigned short serverPort = 5000;
+    unsigned short clientPort = 0;
+
+    //works if the game is run on one computer
+    //solution:
+    //sf::IpAddress ip("192.168.10.62");
     sf::IpAddress ip = sf::IpAddress::getLocalAddress();
 
-    if(!serverRun){
-        serverRun = true;
-        sf::Thread serverThread(&runServer, port);
+    int number = 0;
+    std::cout << "Enter number of player you want to be(1 or 2)" << std::endl;
+    std::cin >> number;
+
+    if(number == 1){
+        sf::Thread serverThread(&runServer, serverPort);
         serverThread.launch();
         sleep(seconds(0.5));
-        runClient(port, ip);
+        clientPort = serverPort + number;
+        runClient(windowSent, serverPort, clientPort,  ip);
     } else {
-        runClient(port, ip);
+        clientPort = serverPort + number;
+        runClient(windowSent, serverPort, clientPort,  ip);
     }
 }

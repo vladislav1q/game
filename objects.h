@@ -12,11 +12,15 @@ float getLenght(Vector2f a);
 unsigned int maxNumberLeaders = 15;
 unsigned int maxLengthName = 20;
 
-int hard = 0;
+unsigned int numberEnemyProduced = 0;
+
+float hard = 0;
 int fullBubbles = 100;
 int numberBars = 0;
 int numberBulletsCage = 50;
 int numberBombsCage = 10;
+
+unsigned int speedBullet = 1500;
 
 unsigned int zombieFullHealth = 300;
 unsigned int zombie1FullHealth = 1000;
@@ -32,7 +36,7 @@ unsigned int zombie1Speed = 100;
 unsigned int zombie2Speed = 150;
 unsigned int zombie3Speed = 150;
 unsigned int dogSpeed = 180;
-unsigned int playerSpeed = 800;
+unsigned int playerSpeed = 300;
 
 unsigned int zombieDamage = 20;
 unsigned int zombie1Damage = 50;
@@ -63,7 +67,6 @@ float shieldProbability = 0.02;
 float bulletProbability = 0.15;
 float bombProbability = 0.1;
 
-
 float bombDistanceExplode = 100000;
 
 unsigned int pistolDamage = 50;
@@ -83,6 +86,17 @@ Texture textureBullet;
 Texture textureBomb;
 Texture texturePlayerInWater;
 Texture textureLocation;
+
+Sprite spritePlayer;
+Sprite spriteZombie;
+Sprite spriteZombie1;
+Sprite spriteZombie2;
+Sprite spriteZombie3;
+Sprite spriteDog;
+Sprite spriteBullet1;
+Sprite spriteBullet2;
+Sprite spriteBomb1;
+Sprite spriteBomb2;
 
 class SortMap{
 public:
@@ -196,6 +210,8 @@ public:
     Vector2f direction;
     Path path;
     Sprite organism;
+    unsigned int uniqueNumber;
+    int aim;
 
     Organism(
             int health1,
@@ -235,7 +251,11 @@ public:
                             attackSmall,
                             numberattack,
                             attacktimebuffer),
-                    organism(sprite1){};
+                    organism(sprite1),
+                    uniqueNumber(numberEnemyProduced+1){
+        numberEnemyProduced++;
+        aim = rand() % 2;
+    };
 
     ~Organism(){};
 
@@ -294,7 +314,7 @@ public:
         }
     }
 
-    void rotate(RenderWindow &window, Vector2f rotateAround){
+    void rotate(Vector2f rotateAround){
         Vector2f d = rotateAround - organism.getPosition();
         organism.setRotation((atan2f(d.y, d.x)*180-270)/M_PI);
     }
@@ -418,7 +438,7 @@ public:
     Vector2f direction;
     Sprite weapon;
 
-    void rotate(RenderWindow &window, Vector2f rotateAround){
+    void rotate(Vector2f rotateAround){
         Vector2f d = weapon.getPosition() - rotateAround;
         weapon.setRotation((-atan2f(d.x, d.y)*180)/M_PI);
     }

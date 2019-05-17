@@ -7,25 +7,25 @@ using namespace sf;
 class SoundsAll{
 public:
     SoundsAll(){
-        for(int i = 0; i < 14; i++){
+        for(int i = 0; i < 13; i++){
             buffer[i].loadFromFile(pathToDirectory + "sounds/sounds/" + std::to_string(i) + ".wav");
             sound[i].setBuffer(buffer[i]);
         }
     }
 
     void setVolume(int volume){
-        for(int i = 0; i < 14; i++){
+        for(int i = 0; i < 13; i++){
             sound[i].setVolume(volume);
         }
     }
 
     void stop(){
-        for(int i = 0; i < 14; i++){
+        for(int i = 0; i < 13; i++){
             sound[i].pause();
         }
     }
-    SoundBuffer buffer[14];
-    Sound sound[14];
+    SoundBuffer buffer[13];
+    Sound sound[13];
 };
 
 class MusicAll{

@@ -22,14 +22,24 @@ void gameViewUpdate(View &gameView, RenderWindow &window, Organism &player, Time
 void strikeWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Organism> &enemies,
                   std::vector<Corpse> &dead, std::vector<Feature> &items);
 
+void strikeAllWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Organism> &enemies1,
+                     std::vector <Organism> &enemies2, std::vector <Organism> &enemies3, std::vector <Organism> &enemies4,
+                     std::vector <Organism> &enemies5, std::vector<Corpse> &dead, std::vector<Feature> &items);
+
 void updateBomb(std::vector<Bomb> &bombs, Time time);
 
 void strikeBomb(const std::vector <Bomb> &bombs, std::vector <Organism> &enemies,
                 std::vector<Corpse> &dead, std::vector<Feature> &items);
 
+void strikeAllBomb(const std::vector <Bomb> &bombs, std::vector <Organism> &enemies1, std::vector <Organism> &enemies2,
+                   std::vector <Organism> &enemies3, std::vector <Organism> &enemies4, std::vector <Organism> &enemies5,
+                std::vector<Corpse> &dead, std::vector<Feature> &items);
+
 void deleteBomb(std::vector <Bomb> &bombs);
 
-void moveEnemies(View &gameView, std::vector <Organism> &enemies, Organism &player, Time time);
+void moveEnemies(std::vector <Organism> &enemies, Organism &player, Time time);
+void moveAllEnemies(std::vector <Organism> &enemies1, std::vector <Organism> &enemies2, std::vector <Organism> &enemies3,
+                    std::vector <Organism> &enemies4, std::vector <Organism> &enemies5, Organism &player, Time time);
 
 void deleteWeapon(View &gameView, std::vector <Weapon> &bullets, Time time);
 

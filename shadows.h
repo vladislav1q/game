@@ -4,6 +4,10 @@
 
 class Opaque{
 public:
+    Opaque(){
+        position = Vector2f(0, 0);
+        size = Vector2f(0, 0);
+    }
     Opaque(sf::Vector2f position1, sf::Vector2f size1) :
             position(position1),
             size(size1){};

@@ -288,10 +288,6 @@ void strikeWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Or
                     soundsAll.sound[7].play();
 
                     enemies.erase(enemies.begin() + numberEnemies);
-//                    while(1){
-//                        window.draw(corpse.corpse);
-//                        window.display();
-//                    }
 
                 }
                 break;
@@ -300,6 +296,16 @@ void strikeWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Or
         }
         numberBullets++;
     }
+}
+
+void strikeAllWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Organism> &enemies1,
+                     std::vector <Organism> &enemies2, std::vector <Organism> &enemies3, std::vector <Organism> &enemies4,
+                     std::vector <Organism> &enemies5, std::vector<Corpse> &dead, std::vector<Feature> &items){
+    strikeWeapon(gameView, bullets, enemies1, dead, items);
+    strikeWeapon(gameView, bullets, enemies2, dead, items);
+    strikeWeapon(gameView, bullets, enemies3, dead, items);
+    strikeWeapon(gameView, bullets, enemies4, dead, items);
+    strikeWeapon(gameView, bullets, enemies5, dead, items);
 }
 
 void updateBomb(std::vector<Bomb> &bombs, Time time){
@@ -338,7 +344,6 @@ void strikeBomb(const std::vector <Bomb> &bombs, std::vector <Organism> &enemies
             float squareLenght = (k.organism.getPosition().x - i.weapon.getPosition().x)*(k.organism.getPosition().x - i.weapon.getPosition().x) +
                                  (k.organism.getPosition().y - i.weapon.getPosition().y)*(k.organism.getPosition().y - i.weapon.getPosition().y);
 
-            //std::cout << " L= " << squareLenght << "  ";
             if(squareLenght <= bombDistanceExplode){
                 k.health -= i.damage;
 
@@ -352,10 +357,6 @@ void strikeBomb(const std::vector <Bomb> &bombs, std::vector <Organism> &enemies
                     soundsAll.sound[7].play();
 
                     enemies.erase(enemies.begin() + numberEnemies);
-//                    while(1){
-//                        window.draw(corpse.corpse);
-//                        window.display();
-//                    }
                 }
                 break;
             }
@@ -365,6 +366,16 @@ void strikeBomb(const std::vector <Bomb> &bombs, std::vector <Organism> &enemies
         numberBombs++;
     }
 
+}
+
+void strikeAllBomb(const std::vector <Bomb> &bombs, std::vector <Organism> &enemies1, std::vector <Organism> &enemies2,
+                   std::vector <Organism> &enemies3, std::vector <Organism> &enemies4, std::vector <Organism> &enemies5,
+                   std::vector<Corpse> &dead, std::vector<Feature> &items){
+    strikeBomb(bombs, enemies1, dead, items);
+    strikeBomb(bombs, enemies2, dead, items);
+    strikeBomb(bombs, enemies3, dead, items);
+    strikeBomb(bombs, enemies4, dead, items);
+    strikeBomb(bombs, enemies5, dead, items);
 }
 
 void deleteBomb(std::vector <Bomb> &bombs){
@@ -380,9 +391,8 @@ void deleteBomb(std::vector <Bomb> &bombs){
     }
 }
 
-void moveEnemies(View &gameView, std::vector <Organism> &enemies, Organism &player, Time time){
+void moveEnemies(std::vector <Organism> &enemies, Organism &player, Time time){
     for(auto &i :enemies){
-        //if(isInside(gameView, i.organism, 0)){
         if(i.health < i.fullHealth*4.0/5 && i.health > i.fullHealth*1.0/2){
             i.path.pathIterator = 1;
 
@@ -417,8 +427,16 @@ void moveEnemies(View &gameView, std::vector <Organism> &enemies, Organism &play
 
 
         }
-        //}
     }
+}
+
+void moveAllEnemies(std::vector <Organism> &enemies1, std::vector <Organism> &enemies2, std::vector <Organism> &enemies3,
+                    std::vector <Organism> &enemies4, std::vector <Organism> &enemies5, Organism &player, Time time){
+    moveEnemies(enemies1, player, time);
+    moveEnemies(enemies2, player, time);
+    moveEnemies(enemies3, player, time);
+    moveEnemies(enemies4, player, time);
+    moveEnemies(enemies5, player, time);
 }
 
 void deleteWeapon(View &gameView, std::vector <Weapon> &bullets, Time time){
@@ -548,7 +566,6 @@ void movePlayer(View &gameView, Organism &player, std::vector<Organism> &enemies
     } else if(bubbleBar.value < fullBubbles){
         bubbleBar.value += time.asSeconds() * 8;
     }
-
 }
 
 void clearAll(std::vector<Organism> &zombies, std::vector<Organism> &zombies1, std::vector<Organism> &zombies2, std::vector<Organism> &zombies3, std::vector<Organism> &dogs,

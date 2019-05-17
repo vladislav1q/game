@@ -35,6 +35,13 @@ Sprite spriteTree5;
 
 class Background {
 public:
+    Background(float speed1, bool crossPlayer1, bool crossEnemy1, bool crossWeapon1, unsigned int type1) :
+        speed(speed1),
+        crossPlayer(crossPlayer1),
+        crossEnemy(crossEnemy1),
+        crossWeapon(crossWeapon1),
+        type(type1){};
+
     Background(){
         crossEnemy = false;
         crossPlayer = false;
@@ -857,9 +864,7 @@ void generateTree(int type, std::vector<Vector2f> &tree){
     }
 }
 
-void setBackground(RenderWindow &window, std::vector<Opaque> &houses) {
-    //srand(time(NULL));
-
+void setBackgroundTypes(){
     BackgroundType backgroundType;
 
     for (int i = 0; i < textures.size(); i++) {
@@ -872,6 +877,10 @@ void setBackground(RenderWindow &window, std::vector<Opaque> &houses) {
 
         backgroundTypes.insert(std::pair<int, BackgroundType>(i, backgroundType));
     }
+}
+
+void setBackground(std::vector<Opaque> &houses) {
+    setBackgroundTypes();
 
     setGrass();
 

@@ -25,9 +25,9 @@ Weapon initBullet(RenderWindow &window, Sprite &spriteBullet, Organism &player, 
     bullet.direction = direction + dr;
 
     bullet.direction = norm(bullet.direction);
-    bullet.speed = 1500;
+    bullet.speed = speedBullet;
     bullet.damage = damage;
-    bullet.rotate(window, mousePosition);
+    bullet.rotate(mousePosition);
 
     return bullet;
 }

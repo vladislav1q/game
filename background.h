@@ -56,7 +56,7 @@ void createTree5();
 
 void generateTree(int type, std::vector<Vector2f> &tree);
 
-void setBackground(RenderWindow &window, std::vector<Opaque> &houses);
+void setBackground(std::vector<Opaque> &houses);
 
 
 //very slow

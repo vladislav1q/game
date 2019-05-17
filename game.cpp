@@ -3,7 +3,6 @@
 #include "draw.h"
 #include "thread"
 #include "pages.h"
-//#include "music.cpp"
 #include "wave.h"
 #include "shadows.h"
 #include "endGame.h"
@@ -40,37 +39,39 @@ void openGame(WindowSent windowSent)
     std::vector<ConvexShape> trapezes;
 
     setTextures();
-    setBackground(windowSent.window, houses);
+    setBackground(houses);
+
+    std::cout << "Zomb " << sizeof(Organism)<< std::endl;
 
     MinimapThread minimapThread;
     Thread thread(&setMinimap, &minimapThread);
     thread.launch();
 
     //Create PlayerSprite
-    Sprite spritePlayer(texturePlayerPaths[0]);
+    spritePlayer.setTexture(texturePlayerPaths[0]);
     //Create ZombieSprite
-    Sprite spriteZombie(textureZombiePathsWalkFullHealth[0]);
+    spriteZombie.setTexture(textureZombiePathsWalkFullHealth[0]);
     //Create Zombie1Sprite
-    Sprite spriteZombie1(textureZombie1PathsWalkFullHealth[0]);
+    spriteZombie1.setTexture(textureZombie1PathsWalkFullHealth[0]);
     spriteZombie1.setScale(3, 3);
     //Create Zombie2Sprite
-    Sprite spriteZombie2(textureZombie2PathsWalkFullHealth[0]);
+    spriteZombie2.setTexture(textureZombie2PathsWalkFullHealth[0]);
     spriteZombie2.setScale(1.5, 1.5);
     //Create Zombie3prite
-    Sprite spriteZombie3(textureZombie3PathsWalkFullHealth[0]);
+    spriteZombie3.setTexture(textureZombie3PathsWalkFullHealth[0]);
     spriteZombie3.setScale(1.5, 1.5);
     //Create DogSprite
-    Sprite spriteDog(textureDogPathsWalkFullHealth[0]);
+    spriteDog.setTexture(textureDogPathsWalkFullHealth[0]);
     //Create BulletSprite
     textureBullet1.loadFromFile(pathToDirectory + "pngForGame/bullet1.png");
-    Sprite spriteBullet1(textureBullet1);
+    spriteBullet1.setTexture(textureBullet1);
     textureBullet2.loadFromFile(pathToDirectory + "pngForGame/bullet2.png");
-    Sprite spriteBullet2(textureBullet2);
+    spriteBullet2.setTexture(textureBullet2);
     //Create BombSprite
     textureBomb1.loadFromFile(pathToDirectory + "pngForGame/bomb1.png");
-    Sprite spriteBomb1(textureBomb1);
+    spriteBomb1.setTexture(textureBomb1);
     textureBomb2.loadFromFile(pathToDirectory + "pngForGame/bomb2.png");
-    Sprite spriteBomb2(textureBomb2);
+    spriteBomb2.setTexture(textureBomb2);
     //Create items Textures
     textureHeart.loadFromFile(pathToDirectory + "pngForGame/heart.png");
     textureShield.loadFromFile(pathToDirectory + "pngForGame/shield.png");
@@ -176,11 +177,7 @@ void openGame(WindowSent windowSent)
         time6 = clock6.getElapsedTime();
         std::cout << " 2: "<<time6.asSeconds();
 
-        moveEnemies(gameView, zombies, player, time);
-        moveEnemies(gameView, zombies1, player, time);
-        moveEnemies(gameView, zombies2, player, time);
-        moveEnemies(gameView, zombies3, player, time);
-        moveEnemies(gameView, dogs, player, time);
+        moveAllEnemies(zombies, zombies1, zombies2, zombies3, dogs, player, time);
 
 //3
         time6 = clock6.getElapsedTime();
@@ -188,17 +185,11 @@ void openGame(WindowSent windowSent)
 
         updateBomb(bombs, time);
 
-        strikeWeapon(gameView, bullets, zombies, dead, items);
-        strikeWeapon(gameView, bullets, zombies1, dead, items);
-        strikeWeapon(gameView, bullets, zombies2, dead, items);
-        strikeWeapon(gameView, bullets, zombies3, dead, items);
-        strikeWeapon(gameView, bullets, dogs, dead, items);
+        strikeAllWeapon(gameView, bullets, zombies, zombies1, zombies2,
+                        zombies3, dogs, dead, items);
 
-        strikeBomb(bombs, zombies, dead, items);
-        strikeBomb(bombs, zombies1, dead, items);
-        strikeBomb(bombs, zombies2, dead, items);
-        strikeBomb(bombs, zombies3, dead, items);
-        strikeBomb(bombs, dogs, dead, items);
+        strikeAllBomb(bombs, zombies, zombies1, zombies2, zombies3,
+                      dogs, dead, items);
 
         deleteWeapon(gameView, bullets, time);
 
@@ -208,41 +199,38 @@ void openGame(WindowSent windowSent)
         time6 = clock6.getElapsedTime();
         std::cout << " 4: "<< time6.asSeconds();
 
-
-        player.rotate(windowSent.window, Vector2f(windowSent.window.mapPixelToCoords(sf::Mouse::getPosition(windowSent.window)).x,
+        player.rotate(Vector2f(windowSent.window.mapPixelToCoords(sf::Mouse::getPosition(windowSent.window)).x,
                                        windowSent.window.mapPixelToCoords(sf::Mouse::getPosition(windowSent.window)).y));
         movePlayer(gameView, player, zombies, zombies1, zombies2, zombies3, dogs, time, bubbleBar);
 
         setShadow(houses, trapezes, player.organism.getPosition());
         spriteShadow.setPosition(player.organism.getPosition());
 
+        //std::cout << "Shad " << sizeof(trapezes[0].getTexture())<< std::endl;
+
         updateFeatures(items, player, time, bulletBar, bombBar);
-
-
-        //sleep(seconds(3));
 
 //5
         time6 = clock6.getElapsedTime();
-        std::cout << " 5: " << time6.asSeconds();
-
+        std::cout << " 50: " << time6.asSeconds();
 
         for(auto &i : zombies)
-            i.rotate(windowSent.window, player.organism.getPosition());
+            i.rotate(player.organism.getPosition());
         for(auto &i : zombies1)
-            i.rotate(windowSent.window, player.organism.getPosition());
+            i.rotate(player.organism.getPosition());
         for(auto &i : zombies2)
-            i.rotate(windowSent.window, player.organism.getPosition());
+            i.rotate(player.organism.getPosition());
         for(auto &i : zombies3)
-            i.rotate(windowSent.window, player.organism.getPosition());
+            i.rotate(player.organism.getPosition());
         for(auto &i : dogs)
-            i.rotate(windowSent.window, player.organism.getPosition());
+            i.rotate(player.organism.getPosition());
 
         int j = 0;
         for(auto &i : bullets){
             if(!i.move(time))
                 bullets.erase(bullets.begin() + j);
             else
-                j++;
+                j+=2;
         }
 
         j = 0;

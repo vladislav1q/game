@@ -156,7 +156,6 @@ void createWave(RenderWindow &window, VideoMode &mode, View &gameView, Time &tim
                 zombie.organism.setScale(1.0, 1.0);
                 dogs.push_back(zombie);
             }
-
         }
 
     }
