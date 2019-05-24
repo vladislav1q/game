@@ -8,7 +8,7 @@ int main()
     VideoMode mode = VideoMode::getDesktopMode();
     RenderWindow window(VideoMode(mode.width, mode.height), "ZOMBIE ATTACK" /*sf::Style::Fullscreen*/);
 
-    window.setFramerateLimit(100);
+    window.setFramerateLimit(200);
 
     menu(window, mode);
 

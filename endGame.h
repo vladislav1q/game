@@ -3,6 +3,8 @@
 #pragma once
 
 void endGame(RenderWindow &window, View &gameView, Time time6, Sprite &spriteCursor){
+
+    window.setView(gameView);
     Event event;
 
     soundsAll.stop();

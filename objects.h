@@ -14,20 +14,20 @@ unsigned int maxLengthName = 20;
 
 unsigned int numberEnemyProduced = 0;
 
-float hard = 0;
+float hard = 1;
 int fullBubbles = 100;
 int numberBars = 0;
 int numberBulletsCage = 50;
 int numberBombsCage = 10;
 
-unsigned int speedBullet = 1500;
+unsigned int speedBullet = 1000;
 
 unsigned int zombieFullHealth = 300;
 unsigned int zombie1FullHealth = 1000;
 unsigned int zombie2FullHealth = 200;
 unsigned int zombie3FullHealth = 200;
 unsigned int dogFullHealth = 100;
-unsigned int playerFullHealth = 300;
+unsigned int playerFullHealth = 30;
 
 unsigned int playerFullProtection = 200;
 
@@ -55,7 +55,7 @@ float timeProducementZombie = 2;
 float timeProducementZombie1 = 3;
 float timeProducementZombie2 = 5;
 float timeProducementZombie3 = 7;
-float timeProducementDog = 1;
+float timeProducementDog = 2.5;
 float timeBufferBomb = 0.3;
 float timeBombExplore = 1;
 float bloodDisappearTime = 0.05;
@@ -147,21 +147,21 @@ public:
          std::vector <Texture> &attackSmall,
          int numberattack, float attacktimebuffer):
 
-         PathsWalkFullHealth(walkFull),
-         PathsWalkHalfHealth(walkHalf),
-         PathsWalkSmallHealth(walkSmall),
-         numberWalk(numberwalk),
-         numberWalkNow(0),
-         walkTimeBuffer(walktimebuffer),
+            PathsWalkFullHealth(walkFull),
+            PathsWalkHalfHealth(walkHalf),
+            PathsWalkSmallHealth(walkSmall),
+            numberWalk(numberwalk),
+            numberWalkNow(0),
+            walkTimeBuffer(walktimebuffer),
 
 
-         PathsAttackFullHealth(attackFull),
-         PathsAttackHalfHealth(attackHalf),
-         PathsAttackSmallHealth(attackSmall),
-         numberAttack(numberattack),
-         numberAttackNow(0),
-         attackTimeBuffer(attacktimebuffer),
-         pathIterator(0){};
+            PathsAttackFullHealth(attackFull),
+            PathsAttackHalfHealth(attackHalf),
+            PathsAttackSmallHealth(attackSmall),
+            numberAttack(numberattack),
+            numberAttackNow(0),
+            attackTimeBuffer(attacktimebuffer),
+            pathIterator(0){};
 
     Path &operator=(const Path &path1){
         PathsWalkFullHealth = path1.PathsWalkFullHealth;
@@ -232,27 +232,27 @@ public:
             int numberattack, float attacktimebuffer,
 
             Sprite &sprite1) :
-                    health(health1),
-                    fullHealth(health1),
-                    protection(protection1),
-                    speed(speed1),
-                    speedDraw(speedDraw1),
-                    damage(damage1),
-                    enemy(enemy1),
-                    direction(Vector2f(0,0)),
-                    path(walkFull,
-                            walkHalf,
-                            walkSmall,
-                            numberwalk,
-                            walktimebuffer,
+            health(health1),
+            fullHealth(health1),
+            protection(protection1),
+            speed(speed1),
+            speedDraw(speedDraw1),
+            damage(damage1),
+            enemy(enemy1),
+            direction(Vector2f(0,0)),
+            path(walkFull,
+                 walkHalf,
+                 walkSmall,
+                 numberwalk,
+                 walktimebuffer,
 
-                            attackFull,
-                            attackHalf,
-                            attackSmall,
-                            numberattack,
-                            attacktimebuffer),
-                    organism(sprite1),
-                    uniqueNumber(numberEnemyProduced+1){
+                 attackFull,
+                 attackHalf,
+                 attackSmall,
+                 numberattack,
+                 attacktimebuffer),
+            organism(sprite1),
+            uniqueNumber(numberEnemyProduced+1){
         numberEnemyProduced++;
         aim = rand() % 2;
     };
@@ -321,8 +321,11 @@ public:
 
     bool move(Time time){
         //player
-        Vector2f x = Vector2f(direction.x, 0) / getLenght(direction);
-        Vector2f y = Vector2f(0, direction.y) / getLenght(direction);
+        float len = getLenght(direction);
+        if(len == 0)
+            return false;
+        Vector2f x = Vector2f(direction.x, 0) / len;
+        Vector2f y = Vector2f(0, direction.y) / len;
 
 
         if(!enemy){
@@ -338,7 +341,7 @@ public:
                     move = true;
                 }
             }
-            //move Y
+                //move Y
             else if(this->getNewPosition(speed*time.asSeconds()*y).crossPlayer && y.y != 0){
                 organism.move(speed*time.asSeconds() * norm(y) * this->getNewPosition(speed*time.asSeconds()*y).speed);
                 move = true;
@@ -365,7 +368,7 @@ public:
                 }
 
             }
-            //move Y
+                //move Y
             else if(this->getNewPosition(speed*time.asSeconds()*y).crossEnemy){
                 if(y.y != 0){
                     organism.move(speed*time.asSeconds() * norm(y) * this->getNewPosition(speed*time.asSeconds() * y).speed);
@@ -384,7 +387,7 @@ public:
         float radiusEnemy = std::min(enemy.organism.getTexture()->getSize().x*enemy.organism.getScale().x*2/5,
                                      enemy.organism.getTexture()->getSize().y*enemy.organism.getScale().y*2/5);
         float radiusMy = std::min(organism.getTexture()->getSize().x*organism.getScale().x*2/5,
-                                     organism.getTexture()->getSize().y*organism.getScale().y*2/5);
+                                  organism.getTexture()->getSize().y*organism.getScale().y*2/5);
         Vector2f d = enemy.organism.getPosition() - organism.getPosition();
 
         return (getLenght(d) < radiusEnemy + radiusMy);
@@ -396,7 +399,7 @@ public:
 
     Background getNewPosition(Vector2f direct){
         return background[(int)((organism.getPosition().x + direct.x) / sizeTile)]
-                [(int)((organism.getPosition().y + direct.y) / sizeTile)];
+        [(int)((organism.getPosition().y + direct.y) / sizeTile)];
     }
 };
 
@@ -455,7 +458,7 @@ public:
 
     bool isInsideOrganism(Organism enemy){
         float radius = std::min(enemy.organism.getTexture()->getSize().x, enemy.organism.getTexture()->getSize().y)/3
-                *std::min(enemy.organism.getScale().x, enemy.organism.getScale().y);
+                       *std::min(enemy.organism.getScale().x, enemy.organism.getScale().y);
 
         return (weapon.getPosition().x < enemy.organism.getPosition().x + radius)
                && (weapon.getPosition().x > enemy.organism.getPosition().x - radius)
@@ -466,9 +469,9 @@ public:
 private:
     bool canCross(Time time){
         if((weapon.getPosition().x + time.asSeconds()*speed*direction.x > 0) &&
-                (weapon.getPosition().x + time.asSeconds()*speed*direction.x < sizeWindow.x * sizeTile) &&
-                (weapon.getPosition().y + time.asSeconds()*speed*direction.y > 0) &&
-                (weapon.getPosition().y + time.asSeconds()*speed*direction.y < sizeWindow.y * sizeTile)){
+           (weapon.getPosition().x + time.asSeconds()*speed*direction.x < sizeWindow.x * sizeTile) &&
+           (weapon.getPosition().y + time.asSeconds()*speed*direction.y > 0) &&
+           (weapon.getPosition().y + time.asSeconds()*speed*direction.y < sizeWindow.y * sizeTile)){
 
             return background[(int)((weapon.getPosition().x + time.asSeconds()*speed*direction.x) / sizeTile)]
             [(int)((weapon.getPosition().y  + time.asSeconds()*speed*direction.x)/ sizeTile)].crossWeapon;
@@ -560,7 +563,7 @@ public:
 class Strike{
 public:
     Strike(std::vector<Weapon> &bulletsNew, std::vector<Organism> &enemiesNew, View &view, std::vector<Corpse> &corpse) :
-    bullets(bulletsNew), enemies(enemiesNew), gameView(view), dead(corpse){};
+            bullets(bulletsNew), enemies(enemiesNew), gameView(view), dead(corpse){};
 
     View &gameView;
     std::vector<Weapon> &bullets;

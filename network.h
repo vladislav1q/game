@@ -1,9 +1,7 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/Network.hpp"
 #include "iostream"
-#include "background.cpp"
 #include "objects.h"
-#include "shadow.h"
 
 #pragma once
 
@@ -18,14 +16,49 @@ enum packetType{
     player,
     map,
     opaque,
-    tree
+    tree,
+    music
 };
 
 struct SendType{
     SendType(){
         type = 0;
     }
+
+    SendType(unsigned int type) :
+            type(type){};
+
     unsigned int type;
+};
+
+int numberSamplesCount = 44100 / 2;
+
+struct SendMusic{
+    SendMusic(){
+        samplesCount = 0;
+        channelCount = 0;
+        sampleRate = 0;
+        samples = new Int16[numberSamplesCount];
+    }
+
+    SendMusic(const Int16 *samples1, Uint64 samplesCount1, unsigned int channelCount1, unsigned int sampleRate1){
+        samplesCount = samplesCount1;
+        channelCount = channelCount1;
+        sampleRate = sampleRate1;
+        samples = new Int16[samplesCount1];
+        for(int i = 0; i < samplesCount1; i++){
+            samples[i] = samples1[i];
+        }
+    }
+
+    ~SendMusic(){
+        delete[] samples;
+    }
+
+    Int16 *samples;
+    Uint64 samplesCount;
+    unsigned int channelCount;
+    unsigned int sampleRate;
 };
 
 struct SendBullet{
@@ -33,14 +66,17 @@ struct SendBullet{
         position = Vector2f(0, 0);
         direction = Vector2f(0, 0);
         damage = 0;
+        rotation = 0;
     }
-    SendBullet(Vector2f position1, Vector2f direction1, unsigned int damage1) :
-    position(position1),
-    direction(direction1),
-    damage(damage1){};
+    SendBullet(Vector2f position1, Vector2f direction1, unsigned int damage1, float rotation1) :
+            position(position1),
+            direction(direction1),
+            damage(damage1),
+            rotation(rotation1){};
 
     Vector2f position;
     Vector2f direction;
+    float rotation;
     unsigned int damage;
 };
 
@@ -59,8 +95,8 @@ struct SendFeature{
         position = Vector2f(0, 0);
     }
     SendFeature(int type1, Vector2f position1) :
-    type(type1),
-    position(position1){};
+            type(type1),
+            position(position1){};
 
     int type;
     Vector2f position;
@@ -75,11 +111,11 @@ struct SendEnemy{
         aim = 0;
     }
     SendEnemy(unsigned int uniqueNumber1, Vector2f position1, float health1, int type1, unsigned int aim1) :
-        uniqueNumber(uniqueNumber1),
-        position(position1),
-        health(health1),
-        type(type1),
-        aim(aim1){};
+            uniqueNumber(uniqueNumber1),
+            position(position1),
+            health(health1),
+            type(type1),
+            aim(aim1){};
 
     unsigned int uniqueNumber;
     // "1 - 5" = types of enemies
@@ -95,17 +131,20 @@ struct SendPlayer{
         position = Vector2f(0, 0);
         direction = Vector2f(0, 0);
         health = 0;
+        rotation = 0;
     }
-    SendPlayer(Vector2f position1, Vector2f direction1, float health1, int type1) :
+    SendPlayer(Vector2f position1, Vector2f direction1, float health1, float rotation1, int type1) :
             position(position1),
             direction(direction1),
             health(health1),
+            rotation(rotation1),
             type(type1){};
 
     unsigned int type;
     Vector2f position;
     Vector2f direction;
     float health;
+    float rotation;
 };
 
 struct SendTree{
@@ -114,12 +153,34 @@ struct SendTree{
         type = 0;
     }
     SendTree(Vector2f position1, int type1) :
-        position(position1),
-        type(type1){};
+            position(position1),
+            type(type1){};
 
     Vector2f position;
     int type;
 };
+
+//SendMusic
+sf::Packet& operator <<(sf::Packet& packet, const SendMusic& A)
+{
+    packet << A.samplesCount << A.channelCount << A.sampleRate;
+
+    for(int i = 0; i < A.samplesCount; i++){
+        packet << A.samples[i];
+    }
+
+    return packet;
+}
+sf::Packet& operator >>(sf::Packet& packet, SendMusic& A)
+{
+    packet >> A.samplesCount >> A.channelCount >> A.sampleRate;
+
+    for(int i = 0; i < A.samplesCount; i++){
+        packet >> A.samples[i];
+    }
+
+    return packet;
+}
 
 //SendTree
 sf::Packet& operator <<(sf::Packet& packet, const SendTree& A)
@@ -134,11 +195,11 @@ sf::Packet& operator >>(sf::Packet& packet, SendTree& A)
 //SendBullet
 sf::Packet& operator <<(sf::Packet& packet, const SendBullet& A)
 {
-    return packet << A.position.x << A.position.y << A.direction.x << A.direction.y;
+    return packet << A.position.x << A.position.y << A.direction.x << A.direction.y << A.rotation << A.damage;
 }
 sf::Packet& operator >>(sf::Packet& packet, SendBullet& A)
 {
-    return packet >> A.position.x >> A.position.y >> A.direction.x >> A.direction.y;
+    return packet >> A.position.x >> A.position.y >> A.direction.x >> A.direction.y >> A.rotation >> A.damage;
 }
 
 //SendBomb
@@ -174,11 +235,11 @@ sf::Packet& operator >>(sf::Packet& packet, SendEnemy& A)
 //SendPlayer
 sf::Packet& operator <<(sf::Packet& packet, const SendPlayer& A)
 {
-    return packet << A.type << A.health << A.position.x << A.position.y << A.direction.x << A.direction.y;
+    return packet << A.type << A.health << A.position.x << A.position.y << A.direction.x << A.direction.y << A.rotation;
 }
 sf::Packet& operator >>(sf::Packet& packet, SendPlayer& A)
 {
-    return packet >> A.type >> A.health >> A.position.x >> A.position.y >> A.direction.x >> A.direction.y;
+    return packet >> A.type >> A.health >> A.position.x >> A.position.y >> A.direction.x >> A.direction.y >> A.rotation;
 }
 
 //SendBackground
@@ -258,6 +319,175 @@ void addFeature(std::vector<Feature> &items, Vector2f position, int type){
     }
 }
 
+void unpackMap(sf::Packet &packet, int x){
+    SendType type;
+    Background map;
+    int numberBackground = 0;
+
+    while(true){
+        packet >> type;
+
+        if(type.type == packetType::end)
+            break;
+        else if(type.type == packetType::map){
+            packet >> map;
+            background[x][numberBackground] = map;
+            numberBackground++;
+        }
+    }
+}
+
+void unpackHouses(sf::Packet &packet, std::vector<Opaque> &houses){
+    SendType type;
+    Opaque opaque;
+
+    while(true){
+        packet >> type;
+
+        if(type.type == packetType::end)
+            break;
+        else if(type.type == packetType::opaque){
+            packet >> opaque;
+            houses.push_back(opaque);
+        }
+    }
+}
+
+void unpackTrees(sf::Packet &packet){
+    SendType type;
+    SendTree sendTree;
+
+    while(true){
+        packet >> type;
+        if(type.type == packetType::end)
+            break;
+        else if(type.type == packetType::tree){
+            packet >> sendTree;
+
+            switch (sendTree.type){
+                case 1:{
+                    trees1.push_back(sendTree.position);
+                    break;
+                }
+                case 2:{
+                    trees2.push_back(sendTree.position);
+                    break;
+                }
+                case 3:{
+                    trees3.push_back(sendTree.position);
+                    break;
+                }
+                case 4:{
+                    trees4.push_back(sendTree.position);
+                    break;
+                }
+                case 5:{
+                    trees1.push_back(sendTree.position);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+void unpackPlayers(sf::Packet &packet, Organism &player1, Organism &player2){
+    SendType type;
+    SendPlayer sendPlayer;
+
+    while(true){
+        packet >> type;
+
+        if(type.type == packetType::end)
+            break;
+        else if(type.type == packetType::player){
+            packet >> sendPlayer;
+            player1.organism.setRotation(sendPlayer.rotation);
+            player1.direction = sendPlayer.direction;
+            player1.health = sendPlayer.health;
+            player1.organism.setPosition(sendPlayer.position);
+            player1.aim = sendPlayer.type;
+
+            packet >> sendPlayer;
+            player2.organism.setRotation(sendPlayer.rotation);
+            player2.direction = sendPlayer.direction;
+            player2.health = sendPlayer.health;
+            player2.organism.setPosition(sendPlayer.position);
+            player2.aim = sendPlayer.type;
+        }
+    }
+}
+
+void unpackClient(sf::Packet &packet, std::vector<Weapon> &bullets, std::vector<Bomb> &bombs, Organism &player1, Organism &player2){
+    SendType type;
+    SendPlayer sendPlayer;
+    SendBomb sendBomb;
+    SendBullet sendBullet;
+
+    while(true){
+        packet >> type;
+
+        if(type.type == packetType::end)
+            break;
+
+        switch (type.type){
+            case packetType::player:{
+                packet >> sendPlayer;
+                if(sendPlayer.type == player1.aim){
+                    player1.organism.setRotation(sendPlayer.rotation);
+                    player1.direction = sendPlayer.direction;
+                    player1.health = sendPlayer.health;
+                    player1.organism.setPosition(sendPlayer.position);
+                } else if(sendPlayer.type == player2.aim){
+                    player2.organism.setRotation(sendPlayer.rotation);
+                    player2.direction = sendPlayer.direction;
+                    player2.health = sendPlayer.health;
+                    player2.organism.setPosition(sendPlayer.position);
+                }
+                break;
+            }
+            case packetType::bomb:{
+                packet >> sendBomb;
+
+                Bomb bomb;
+                bomb.weapon = spriteBomb1;
+                bomb.weapon.setPosition(sendBomb.position);
+                bomb.timeBuffer = 0;
+                bomb.timeExplode = 0;
+                bomb.damage = bombDamage;
+                bomb.textureNumber = 1;
+                bombs.push_back(bomb);
+
+                //send bomb
+
+                break;
+            }
+            case packetType::bullet:{
+                packet >> sendBullet;
+
+                Weapon bullet;
+                bullet.direction = sendBullet.direction;
+                bullet.speed = speedBullet;
+                bullet.damage = sendBullet.damage;
+                if(bullet.damage == shotgunDamage)
+                    bullet.weapon = spriteBullet2;
+                else
+                    bullet.weapon = spriteBullet1;
+                bullet.weapon.setPosition(sendBullet.direction);
+
+                //bullet.rotate()
+
+                bullets.push_back(bullet);
+
+                //send bullet
+
+                break;
+            }
+        }
+    }
+}
+
+
+
 void unpack(sf::Packet &packet, std::vector<Weapon> &bullets, std::vector<Bomb> &bombs, std::vector<Feature> &items,
             std::vector<Organism> &zombies, std::vector<Organism> &zombies1, std::vector<Organism> &zombies2,
             std::vector<Organism> &zombies3, std::vector<Organism> &dogs,std::vector<Opaque> &houses,
@@ -268,12 +498,7 @@ void unpack(sf::Packet &packet, std::vector<Weapon> &bullets, std::vector<Bomb> 
     SendFeature sendFeature;
     SendEnemy sendEnemy;
     SendPlayer sendPlayer;
-    SendTree sendTree;
-    Background map;
     Opaque opaque;
-
-    int numberBackground = 0;
-
 
     while(true){
         packet >> type;
@@ -295,7 +520,7 @@ void unpack(sf::Packet &packet, std::vector<Weapon> &bullets, std::vector<Bomb> 
                 bullet.weapon.setPosition(sendBullet.direction);
                 //bullet.rotate()
                 bullets.push_back(bullet);
-                return;
+                break;
             }
 
             case packetType::bomb:{
@@ -430,49 +655,24 @@ void unpack(sf::Packet &packet, std::vector<Weapon> &bullets, std::vector<Bomb> 
 
                             break;
                         }
-
                     }
                 }
 
             }
             case packetType::player:{
                 packet >> sendPlayer;
-                if(sendPlayer.type == 0){
+                if(sendPlayer.type == player1.aim){
+                    player1.organism.setRotation(sendPlayer.rotation);
                     player1.direction = sendPlayer.direction;
                     player1.health = sendPlayer.health;
                     player1.organism.setPosition(sendPlayer.position);
-                } else if(sendPlayer.type == 1){
+                } else if(sendPlayer.type == player2.aim){
+                    player2.organism.setRotation(sendPlayer.rotation);
                     player2.direction = sendPlayer.direction;
                     player2.health = sendPlayer.health;
                     player2.organism.setPosition(sendPlayer.position);
                 }
                 break;
-            }
-            case packetType::map:{
-                packet >> map;
-                background[numberBackground / sizeWindow.x][numberBackground % sizeWindow.x] = map;
-                numberBackground++;
-                break;
-            }
-            case packetType::opaque:{
-                packet >> opaque;
-                houses.push_back(opaque);
-                break;
-            }
-            case packetType::tree:{
-                packet >> sendTree;
-                switch (sendTree.type){
-                    case 1:
-                        trees1.push_back(sendTree.position);
-                    case 2:
-                        trees2.push_back(sendTree.position);
-                    case 3:
-                        trees3.push_back(sendTree.position);
-                    case 4:
-                        trees4.push_back(sendTree.position);
-                    case 5:
-                        trees5.push_back(sendTree.position);
-                }
             }
 
             default:
@@ -480,7 +680,5 @@ void unpack(sf::Packet &packet, std::vector<Weapon> &bullets, std::vector<Bomb> 
 
         }
     }
-
-    packet.clear();
 }
 

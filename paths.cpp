@@ -18,6 +18,7 @@ int numberDogPathsWalk = 4;
 Texture textureCorpse;
 
 const std::string pathToDirectory = "/home/vladislav/CLionProjects/game/";
+//const std::string pathToDirectory = "/home/zygalo/game/";
 
 const std::string zombie1PathsWalkFullHealth[5] = {
         pathToDirectory + "pngForGame/zombie2/1/21.png",
@@ -355,6 +356,7 @@ void setTextures(){
     //in water
     texture.loadFromFile(playerPathsWalkFullHealth[numberPlayerPathsWalk]);
     texturePlayerPaths.push_back(texture);
+
 
 };
 

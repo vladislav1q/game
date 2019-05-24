@@ -58,7 +58,6 @@ void generateTree(int type, std::vector<Vector2f> &tree);
 
 void setBackground(std::vector<Opaque> &houses);
 
-
 //very slow
 //works if the map is less than 800*800
 //do not start in thread if map is more than 600*600

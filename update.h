@@ -19,10 +19,10 @@ void updateFeatures(std::vector<Feature> &items, Organism &player, Time time, Ba
 
 void gameViewUpdate(View &gameView, RenderWindow &window, Organism &player, Time time);
 
-void strikeWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Organism> &enemies,
+void strikeWeaponClient(std::vector <Weapon> &bullets, std::vector <Organism> &enemies,
                   std::vector<Corpse> &dead, std::vector<Feature> &items);
 
-void strikeAllWeapon(View &gameView, std::vector <Weapon> &bullets, std::vector <Organism> &enemies1,
+void strikeAllWeaponClient(std::vector <Weapon> &bullets, std::vector <Organism> &enemies1,
                      std::vector <Organism> &enemies2, std::vector <Organism> &enemies3, std::vector <Organism> &enemies4,
                      std::vector <Organism> &enemies5, std::vector<Corpse> &dead, std::vector<Feature> &items);
 
@@ -41,7 +41,7 @@ void moveEnemies(std::vector <Organism> &enemies, Organism &player, Time time);
 void moveAllEnemies(std::vector <Organism> &enemies1, std::vector <Organism> &enemies2, std::vector <Organism> &enemies3,
                     std::vector <Organism> &enemies4, std::vector <Organism> &enemies5, Organism &player, Time time);
 
-void deleteWeapon(View &gameView, std::vector <Weapon> &bullets, Time time);
+void deleteWeapon(std::vector <Weapon> &bullets, Time time);
 
 void movePlayer(View &gameView, Organism &player, std::vector<Organism> &enemies1, std::vector<Organism> &enemies2,
                 std::vector<Organism> &enemies3, std::vector<Organism> &enemies4, std::vector<Organism> &enemies5,

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 project(game)
 
 set(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -L/usr/X11R6/lib -lm -lpthread -lX11")
 
 set(SOURCE_FILES main.cpp network.h)
 add_executable(game ${SOURCE_FILES})

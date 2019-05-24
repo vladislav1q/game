@@ -10,27 +10,27 @@ struct Draw{
          std::vector<Organism> &zombies21, std::vector<Organism> &zombies31, std::vector<Organism> &dogs1,
          std::vector<Corpse> &dead1, std::vector<Weapon> &bullets1, std::vector<Bomb> &bombs1, std::vector<Feature> &items1,  std::vector<ConvexShape> &trapezes1, Organism &player1,
          Bar &lifeBar1, Bar &bubbleBar1, Bar &shieldBar1, Bar &bulletBar1, Bar &bombBar1, TimeBar &timeBar1, Sprite &spriteCursor1, Sprite &shadow1) :
-         window(window1),
-         gameView(gameView1),
-         zombies(zombies1),
-         zombies1(zombies11),
-         zombies2(zombies21),
-         zombies3(zombies31),
-         dogs(dogs1),
-         dead(dead1),
-         bullets(bullets1),
-         bombs(bombs1),
-         items(items1),
-         trapezes(trapezes1),
-         player(player1),
-         lifeBar(lifeBar1),
-         bubbleBar(bubbleBar1),
-         shieldBar(shieldBar1),
-         bulletBar(bulletBar1),
-         bombBar(bombBar1),
-         timeBar(timeBar1),
-         spriteCursor(spriteCursor1),
-         shadow(shadow1){};
+            window(window1),
+            gameView(gameView1),
+            zombies(zombies1),
+            zombies1(zombies11),
+            zombies2(zombies21),
+            zombies3(zombies31),
+            dogs(dogs1),
+            dead(dead1),
+            bullets(bullets1),
+            bombs(bombs1),
+            items(items1),
+            trapezes(trapezes1),
+            player(player1),
+            lifeBar(lifeBar1),
+            bubbleBar(bubbleBar1),
+            shieldBar(shieldBar1),
+            bulletBar(bulletBar1),
+            bombBar(bombBar1),
+            timeBar(timeBar1),
+            spriteCursor(spriteCursor1),
+            shadow(shadow1){};
 
     RenderWindow &window;
     View &gameView;
@@ -149,7 +149,7 @@ void drawGameview(Draw &A){
         A.window.draw(i.feature);
     }
 
-        A.window.draw(A.player.organism);
+    A.window.draw(A.player.organism);
 
     for(auto &i :trees1){
         if(isInside(A.gameView, i, 0)){
@@ -222,6 +222,257 @@ void drawGameview(Draw &A){
 
     A.shieldBar.updateBar(A.gameView, A.player.protection, playerFullProtection);
     if(A.player.protection > 0){
+        A.window.draw(A.shieldBar.sprite);
+        A.window.draw(A.shieldBar.text);
+        A.window.draw(A.shieldBar.shape);
+        numberBars++;
+    }
+
+    A.bulletBar.updateBarWeapon(A.gameView, A.bulletBar.value, numberBulletsCage);
+    if(A.bulletBar.value > 0){
+        A.window.draw(A.bulletBar.sprite);
+        A.window.draw(A.bulletBar.text);
+        A.window.draw(A.bulletBar.shape);
+        numberBars++;
+    }
+
+    A.bombBar.updateBarWeapon(A.gameView,  A.bombBar.value, numberBombsCage);
+    if(A.bombBar.value > 0){
+        A.window.draw(A.bombBar.sprite);
+        A.window.draw(A.bombBar.text);
+        A.window.draw(A.bombBar.shape);
+        numberBars++;
+    }
+
+    A.window.draw(A.timeBar.text);
+
+    A.window.draw(A.spriteCursor);
+    //A.window.display();
+
+}
+
+struct Draw2{
+
+    Draw2(RenderWindow &window1, View &gameView1, std::vector<Organism> &zombies1, std::vector<Organism> &zombies11,
+          std::vector<Organism> &zombies21, std::vector<Organism> &zombies31, std::vector<Organism> &dogs1,
+          std::vector<Corpse> &dead1, std::vector<Weapon> &bullets1, std::vector<Bomb> &bombs1, std::vector<Feature> &items1,  std::vector<ConvexShape> &trapezes1,
+          Organism &player11, Organism &player21,
+          Bar &lifeBar1, Bar &bubbleBar1, Bar &shieldBar1, Bar &bulletBar1, Bar &bombBar1, TimeBar &timeBar1, Sprite &spriteCursor1, Sprite &shadow1) :
+            window(window1),
+            gameView(gameView1),
+            zombies(zombies1),
+            zombies1(zombies11),
+            zombies2(zombies21),
+            zombies3(zombies31),
+            dogs(dogs1),
+            dead(dead1),
+            bullets(bullets1),
+            bombs(bombs1),
+            items(items1),
+            trapezes(trapezes1),
+            player1(player11),
+            player2(player21),
+            lifeBar(lifeBar1),
+            bubbleBar(bubbleBar1),
+            shieldBar(shieldBar1),
+            bulletBar(bulletBar1),
+            bombBar(bombBar1),
+            timeBar(timeBar1),
+            spriteCursor(spriteCursor1),
+            shadow(shadow1){};
+
+    RenderWindow &window;
+    View &gameView;
+
+    std::vector<Organism> &zombies;
+    std::vector<Organism> &zombies1;
+    std::vector<Organism> &zombies2;
+    std::vector<Organism> &zombies3;
+    std::vector<Organism> &dogs;
+
+    std::vector<Corpse> &dead;
+    std::vector<Weapon> &bullets;
+    std::vector<Bomb> &bombs;
+    std::vector<Feature> &items;
+    std::vector<ConvexShape> &trapezes;
+
+    Organism &player1;
+    Organism &player2;
+    Bar &lifeBar;
+    Bar &bubbleBar;
+    Bar &shieldBar;
+    Bar &bulletBar;
+    Bar &bombBar;
+    TimeBar &timeBar;
+
+    Sprite &spriteCursor;
+    Sprite &shadow;
+};
+
+
+
+void drawGameview2(Draw2 &A){
+
+    A.window.setView(A.gameView);
+
+    A.window.clear();
+
+    float gameViewLeft = (A.gameView.getCenter().x - A.gameView.getSize().x / 2) / sizeTile - 5 ;
+    float gameViewRight = (A.gameView.getCenter().x + A.gameView.getSize().x / 2) / sizeTile + 5;
+    float gameViewUp = (A.gameView.getCenter().y - A.gameView.getSize().y / 2) / sizeTile - 5;
+    float gameViewDown = (A.gameView.getCenter().y + A.gameView.getSize().y / 2) / sizeTile + 5;
+
+    if(gameViewLeft < 0)
+        gameViewLeft = 0;
+    if(gameViewRight > sizeWindow.x)
+        gameViewRight = sizeWindow.x;
+    if(gameViewUp < 0)
+        gameViewUp = 0;
+    if(gameViewDown > sizeWindow.y)
+        gameViewDown = sizeWindow.y;
+
+    for(int i = (int)gameViewLeft; i < gameViewRight; i++){
+        for(int j = (int)gameViewUp;j < gameViewDown; j++){
+            //not house
+            if(background[i][j].type < 22 || background[i][j].type > 79){
+                backgroundTypes.at(background[i][j].type).picture.setPosition(i * sizeTile, j * sizeTile);
+                A.window.draw(backgroundTypes.at(background[i][j].type).picture);
+            }
+        }
+    }
+
+
+    for(auto &i : A.dead){
+        if(isInside(A.gameView, i.corpse.getPosition(), 0))
+            A.window.draw(i.corpse);
+    }
+
+    for(auto &i : A.bullets)
+        A.window.draw(i.weapon);
+
+    for(auto &i : A.bombs)
+        A.window.draw(i.weapon);
+
+    for(auto &i : A.zombies){
+        //if(isInside(A.gameView, i.organism.getPosition(), 0))
+        float squareLen = (A.player1.organism.getPosition().x-i.organism.getPosition().x) * (A.player1.organism.getPosition().x-i.organism.getPosition().x) +
+                          (A.player1.organism.getPosition().y-i.organism.getPosition().y) * (A.player1.organism.getPosition().y-i.organism.getPosition().y);
+
+        if(squareLen < (A.shadow.getScale().x * (float)1000) * (A.shadow.getScale().x * (float)1000))
+            A.window.draw(i.organism);
+    }
+
+    for(auto &i : A.zombies1){
+        float squareLen = (A.player1.organism.getPosition().x-i.organism.getPosition().x) * (A.player1.organism.getPosition().x-i.organism.getPosition().x) +
+                          (A.player1.organism.getPosition().y-i.organism.getPosition().y) * (A.player1.organism.getPosition().y-i.organism.getPosition().y);
+
+        if(squareLen < (A.shadow.getScale().x * (float)1000) * (A.shadow.getScale().x * (float)1000))
+            A.window.draw(i.organism);
+    }
+
+    for(auto &i : A.zombies2){
+        float squareLen = (A.player1.organism.getPosition().x-i.organism.getPosition().x) * (A.player1.organism.getPosition().x-i.organism.getPosition().x) +
+                          (A.player1.organism.getPosition().y-i.organism.getPosition().y) * (A.player1.organism.getPosition().y-i.organism.getPosition().y);
+
+        if(squareLen < (A.shadow.getScale().x * (float)1000) * (A.shadow.getScale().x * (float)1000))
+            A.window.draw(i.organism);
+    }
+
+    for(auto &i : A.zombies3){
+        float squareLen = (A.player1.organism.getPosition().x-i.organism.getPosition().x) * (A.player1.organism.getPosition().x-i.organism.getPosition().x) +
+                          (A.player1.organism.getPosition().y-i.organism.getPosition().y) * (A.player1.organism.getPosition().y-i.organism.getPosition().y);
+
+        if(squareLen < (A.shadow.getScale().x * (float)1000) * (A.shadow.getScale().x * (float)1000))
+            A.window.draw(i.organism);
+    }
+
+    for(auto &i : A.dogs){
+        float squareLen = (A.player1.organism.getPosition().x-i.organism.getPosition().x) * (A.player1.organism.getPosition().x-i.organism.getPosition().x) +
+                          (A.player1.organism.getPosition().y-i.organism.getPosition().y) * (A.player1.organism.getPosition().y-i.organism.getPosition().y);
+
+        if(squareLen < (A.shadow.getScale().x * (float)1000) * (A.shadow.getScale().x * (float)1000))
+            A.window.draw(i.organism);
+    }
+
+    for(auto &i : A.items){
+        //if(isInside(gameView, i.feature, 0))
+        A.window.draw(i.feature);
+    }
+
+    A.window.draw(A.player1.organism);
+    A.window.draw(A.player2.organism);
+
+    for(auto &i :trees1){
+        if(isInside(A.gameView, i, 0)){
+            spriteTree1.setPosition(i);
+            A.window.draw(spriteTree1);
+        }
+    }
+
+    for(auto &i :trees2){
+        if(isInside(A.gameView, i, 0)){
+            spriteTree2.setPosition(i);
+            A.window.draw(spriteTree2);
+        }
+    }
+
+    for(auto &i :trees3){
+        if(isInside(A.gameView, i, 0)){
+            spriteTree3.setPosition(i);
+            A.window.draw(spriteTree3);
+        }
+    }
+
+    for(auto &i :trees4){
+        if(isInside(A.gameView, i, 0)){
+            spriteTree4.setPosition(i);
+            A.window.draw(spriteTree4);
+        }
+    }
+
+    for(auto &i :trees5){
+        if(isInside(A.gameView, i, 0)){
+            spriteTree5.setPosition(i);
+            A.window.draw(spriteTree5);
+        }
+    }
+
+    for(auto &i : A.trapezes){
+        A.window.draw(i);
+    }
+
+    for(int i = (int)gameViewLeft; i < gameViewRight; i++){
+        for(int j = (int)gameViewUp;j < gameViewDown; j++){
+            //house
+            if(background[i][j].type > 21 && background[i][j].type < 80){
+                backgroundTypes.at(background[i][j].type).picture.setPosition(i * sizeTile, j * sizeTile);
+                A.window.draw(backgroundTypes.at(background[i][j].type).picture);
+            }
+        }
+    }
+
+    A.window.draw(A.shadow);
+
+    numberBars = 0;
+
+    A.lifeBar.updateBar(A.gameView, A.player1.health, playerFullHealth);
+    if(A.player1.health > 0){
+        A.window.draw(A.lifeBar.sprite);
+        A.window.draw(A.lifeBar.shape);
+        A.window.draw(A.lifeBar.text);
+        numberBars++;
+    }
+
+    A.bubbleBar.updateBar(A.gameView, A.bubbleBar.value, fullBubbles);
+    if(A.bubbleBar.value > 0){
+        A.window.draw(A.bubbleBar.sprite);
+        A.window.draw(A.bubbleBar.shape);
+        A.window.draw(A.bubbleBar.text);
+        numberBars++;
+    }
+
+    A.shieldBar.updateBar(A.gameView, A.player1.protection, playerFullProtection);
+    if(A.player1.protection > 0){
         A.window.draw(A.shieldBar.sprite);
         A.window.draw(A.shieldBar.text);
         A.window.draw(A.shieldBar.shape);

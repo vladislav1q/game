@@ -28,6 +28,11 @@ void menu(RenderWindow &window, VideoMode &mode){
 
     //Sounds
 
+    Clock clock;
+    Time time = clock.getElapsedTime();
+    bool changeColor = false;
+    int color = 0;
+
 
     musicAll.music[numberMusicMenu].play();
 
@@ -91,7 +96,22 @@ void menu(RenderWindow &window, VideoMode &mode){
         exit.update(window);
         updateCursor(window, spriteCursor);
 
-        window.clear(Color(50, 100, 255, 0));
+        time = clock.restart();
+        if(!changeColor){
+            color += (int)(time.asSeconds() * 200);
+            if(color > 255){
+                color = 255;
+                changeColor = true;
+            }
+        } else{
+            color -= (int)(time.asSeconds() * 200);
+            if(color < 50){
+                color = 50;
+                changeColor = false;
+            }
+        }
+
+        window.clear(Color(100, 100, color, 0));
         startGame.draw(window);
         settings.draw(window);
         rules.draw(window);

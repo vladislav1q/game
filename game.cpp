@@ -90,17 +90,7 @@ void openGame(WindowSent windowSent)
     //Init Player
     texturePlayerInWater.loadFromFile(pathToDirectory + "pngForGame/playerInWater.png");
 
-    Organism player(playerFullHealth, playerFullProtection, playerSpeed, speedDrawPlayer, 0, false,
-                    texturePlayerPaths, texturePlayerPaths, texturePlayerPaths, numberPlayerPathsWalk, 0.01,
-                    texturePlayerPaths, texturePlayerPaths, texturePlayerPaths, numberPlayerPathsWalk, 0.01, spritePlayer);
-    while(true){
-        player.organism.setPosition(rand() % (sizeWindow.x * sizeTile - 200) + 100, rand() % (sizeWindow.y * sizeTile - 200) + 100);
-        if(player.getPosition().crossEnemy)
-            break;
-    }
-    Vector2u playerSize = player.organism.getTexture()->getSize();
-    player.organism.setOrigin((float)playerSize.x/2, (float)playerSize.y/2);
-    player.organism.setScale(0.6, 0.6);
+    Organism player = initPlayer();
 
     //Create shadow
     Texture textureShadow;
@@ -136,8 +126,10 @@ void openGame(WindowSent windowSent)
     float timeBufferBombInit = 0;
     float timebufferMinimapInit = 0;
     float timeBufferMinimap = 0;
+    float timebufferSoundRecord = 0;
 
     bool minimap = false;
+
     Time time,time6, timePause;
     timePause = clock6.restart();
 
@@ -163,6 +155,7 @@ void openGame(WindowSent windowSent)
         timeBufferBombInit += time.asSeconds();
         timeBufferMinimap += time.asSeconds();
         timebufferMinimapInit += time.asSeconds();
+        timebufferSoundRecord += time.asSeconds();
 
         std::cout << time.asSeconds()<< std::endl;
 
@@ -185,13 +178,13 @@ void openGame(WindowSent windowSent)
 
         updateBomb(bombs, time);
 
-        strikeAllWeapon(gameView, bullets, zombies, zombies1, zombies2,
+        strikeAllWeapon(bullets, zombies, zombies1, zombies2,
                         zombies3, dogs, dead, items);
 
         strikeAllBomb(bombs, zombies, zombies1, zombies2, zombies3,
                       dogs, dead, items);
 
-        deleteWeapon(gameView, bullets, time);
+        deleteWeapon(bullets, time);
 
         deleteBomb(bombs);
 
@@ -206,31 +199,21 @@ void openGame(WindowSent windowSent)
         setShadow(houses, trapezes, player.organism.getPosition());
         spriteShadow.setPosition(player.organism.getPosition());
 
-        //std::cout << "Shad " << sizeof(trapezes[0].getTexture())<< std::endl;
 
         updateFeatures(items, player, time, bulletBar, bombBar);
 
 //5
         time6 = clock6.getElapsedTime();
-        std::cout << " 50: " << time6.asSeconds();
+        std::cout << " 5: " << time6.asSeconds();
 
-        for(auto &i : zombies)
-            i.rotate(player.organism.getPosition());
-        for(auto &i : zombies1)
-            i.rotate(player.organism.getPosition());
-        for(auto &i : zombies2)
-            i.rotate(player.organism.getPosition());
-        for(auto &i : zombies3)
-            i.rotate(player.organism.getPosition());
-        for(auto &i : dogs)
-            i.rotate(player.organism.getPosition());
+        rotateEnemies(zombies, zombies1, zombies2, zombies3, dogs, player);
 
         int j = 0;
         for(auto &i : bullets){
             if(!i.move(time))
                 bullets.erase(bullets.begin() + j);
             else
-                j+=2;
+                j++;
         }
 
         j = 0;
@@ -277,6 +260,7 @@ void openGame(WindowSent windowSent)
             else
                 minimap = true;
         }
+
 
         if(Keyboard::isKeyPressed(Keyboard::Escape)){
             thread.terminate();
@@ -349,9 +333,7 @@ void openGame(WindowSent windowSent)
         time6 = clock6.getElapsedTime();
         std::cout << " 7: " << time6.asSeconds();
 
-        createWave(windowSent.window, windowSent.mode, gameView, time6, time, spriteZombie, spriteZombie1, spriteZombie2, spriteZombie3, spriteDog,
-                   zombies, zombies1, zombies2, zombies3, dogs);
-
+        createWave(windowSent.window, windowSent.mode, gameView, time6, time, zombies, zombies1, zombies2, zombies3, dogs);
 
 
         //minimap Update & Draw
@@ -359,12 +341,9 @@ void openGame(WindowSent windowSent)
 
         windowSent.window.display();
 
-//8
         time6 = clock6.getElapsedTime();
         std::cout << " 8: " << time6.asSeconds();
-
         std::cout << "End"<< std::endl;
-
 
         if(player.health <= 0){
             thread.terminate();

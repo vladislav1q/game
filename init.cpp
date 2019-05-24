@@ -1,6 +1,8 @@
 #include "update.h"
 #pragma once
 
+int numberplayers = 0;
+
 void setCursor(RenderWindow &window, Sprite &spriteCursor){
     spriteCursor.setScale(0.05f, 0.05f);
     spriteCursor.setOrigin(spriteCursor.getPosition().x + spriteCursor.getTexture()->getSize().x
@@ -46,6 +48,25 @@ Bomb initBomb(RenderWindow &window, Sprite &spriteBomb, int damage){
     bomb.timeExplode = 0;
 
     return bomb;
+}
+
+Organism initPlayer(){
+    numberplayers++;
+    Organism player(playerFullHealth, playerFullProtection, playerSpeed, speedDrawPlayer, 0, false,
+                    texturePlayerPaths, texturePlayerPaths, texturePlayerPaths, numberPlayerPathsWalk, 0.01,
+                    texturePlayerPaths, texturePlayerPaths, texturePlayerPaths, numberPlayerPathsWalk, 0.01, spritePlayer);
+    while(true){
+        player.organism.setPosition(rand() % (sizeWindow.x * sizeTile - 200) + 100, rand() % (sizeWindow.y * sizeTile - 200) + 100);
+        if(player.getPosition().crossEnemy)
+            break;
+    }
+    Vector2u playerSize = player.organism.getTexture()->getSize();
+    player.direction = Vector2f(0, 0);
+    player.organism.setOrigin((float)playerSize.x/2, (float)playerSize.y/2);
+    player.organism.setScale(0.6, 0.6);
+    player.aim = numberplayers;
+
+    return player;
 }
 
 

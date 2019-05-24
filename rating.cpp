@@ -63,6 +63,11 @@ void openLeaders(RenderWindow &window, VideoMode &mode){
     Sprite spriteCursor(textureCursor0);
     setCursor(window, spriteCursor);
 
+    Clock clock;
+    Time time = clock.getElapsedTime();
+    bool changeColor = false;
+    int color = 0;
+
     while(window.isOpen()){
 
         while(window.pollEvent(event)){
@@ -82,7 +87,22 @@ void openLeaders(RenderWindow &window, VideoMode &mode){
             }
         }
 
-        window.clear(Color(50, 100, 255, 0));
+        time = clock.restart();
+        if(!changeColor){
+            color += (int)(time.asSeconds() * 200);
+            if(color > 255){
+                color = 255;
+                changeColor = true;
+            }
+        } else{
+            color -= (int)(time.asSeconds() * 200);
+            if(color < 50){
+                color = 50;
+                changeColor = false;
+            }
+        }
+
+        window.clear(Color(100, 100, color, 0));
 
         back.update(window);
         updateCursor(window, spriteCursor);

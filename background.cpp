@@ -879,8 +879,18 @@ void setBackgroundTypes(){
     }
 }
 
-void setBackground(std::vector<Opaque> &houses) {
+void initBackground(){
     setBackgroundTypes();
+
+    createTree1();
+    createTree2();
+    createTree3();
+    createTree4();
+    createTree5();
+}
+
+void setBackground(std::vector<Opaque> &houses) {
+    initBackground();
 
     setGrass();
 
@@ -905,11 +915,6 @@ void setBackground(std::vector<Opaque> &houses) {
         generateHouse(houses);
     }
 
-    createTree1();
-    createTree2();
-    createTree3();
-    createTree4();
-    createTree5();
     for(int i = 0; i < sizeWindow.x / 25; i++){
         generateTree(21, trees1);
     }
@@ -949,17 +954,7 @@ struct MinimapThread{
 //recommended not to start in thread if map is more than 600*600
 void setMinimap(MinimapThread *minimap){
 
-    Clock clock1;
-    Time time1;
-    time1 = clock1.getElapsedTime();
-    std::cout << "Time thread1 " << time1.asSeconds();
-
-    std::cout << "Thread started" << std::endl;
-
     minimap->image.create((sizeWindow.x * sizeTile), (sizeWindow.y * sizeTile), Color(255, 255, 255, 0));
-
-    time1 = clock1.getElapsedTime();
-    std::cout << "Time thread2 " << time1.asSeconds();
 
     for(int i = 0; i < sizeWindow.x; i++){
         for(int j = 0; j < sizeWindow.y; j++){
@@ -969,24 +964,13 @@ void setMinimap(MinimapThread *minimap){
         }
     }
 
-    time1 = clock1.getElapsedTime();
-    std::cout << "Time thread3 " << time1.asSeconds();
 
     minimap->texture.loadFromImage(minimap->image);
-
-    time1 = clock1.getElapsedTime();
-    std::cout << "Time thread4 " << time1.asSeconds() << std::endl;
 
     minimap->sprite.setTexture(minimap->texture);
     minimap->sprite.setOrigin(minimap->sprite.getTexture()->getSize().x / 2.0, minimap->sprite.getTexture()->getSize().y / 2.0);
     minimap->sprite.setScale(minimapScale, minimapScale);
 
     minimap->sprite.setColor(Color(255, 255, 255, minimapTransparancy));
-
-    std::cout << "Thread ended" << std::endl;
-
-
-
-    //minimap->image.saveToFile("/home/vladislav/CLionProjects/game/pngForGame/map.png");
 }
 
